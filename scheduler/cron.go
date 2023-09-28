@@ -13,7 +13,8 @@ type Cron struct {
 
 func CronInit() Cron {
 	return Cron{
-		wg: sync.WaitGroup{},
+		wg:   sync.WaitGroup{},
+		jobs: make([]Job, 0),
 	}
 }
 
@@ -29,10 +30,9 @@ func (c *Cron) AddFunction(period time.Duration, job Job) {
 }
 
 func (c *Cron) RunAll() {
-	for i := 0; i < len(c.jobs); i++ {
-		go c.jobs[i]()
+	for _, job := range c.jobs {
+		go job()
 	}
 
-	c.wg.Wait()
 	fmt.Scanln()
 }
