@@ -6,19 +6,19 @@ import (
 	"time"
 )
 
-type Cron struct {
+type cron struct {
 	wg   sync.WaitGroup
 	jobs map[int]Job
 }
 
-func CronInit() Cron {
-	return Cron{
+func Cron() cron {
+	return cron{
 		wg:   sync.WaitGroup{},
 		jobs: map[int]Job{},
 	}
 }
 
-func (c *Cron) AddFunction(expectedDuration time.Duration, period time.Duration, job Job, identifier int) {
+func (c *cron) AddFunction(expectedDuration time.Duration, period time.Duration, job Job, identifier int) {
 	c.wg.Add(1)
 	f := func() {
 		for {
@@ -29,7 +29,7 @@ func (c *Cron) AddFunction(expectedDuration time.Duration, period time.Duration,
 	c.jobs[identifier] = f
 }
 
-func (c *Cron) RunAll() {
+func (c *cron) RunAll() {
 	for _, job := range c.jobs {
 		go job()
 	}

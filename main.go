@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	c := cron.CronInit()
+	c := cron.Cron()
 	c.AddFunction(0, time.Millisecond*1000, func() {
 		fmt.Println(1)
 	}, 1)
