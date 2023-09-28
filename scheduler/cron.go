@@ -8,17 +8,17 @@ import (
 
 type Cron struct {
 	wg   sync.WaitGroup
-	jobs []Job
+	jobs map[int]Job
 }
 
 func CronInit() Cron {
 	return Cron{
 		wg:   sync.WaitGroup{},
-		jobs: make([]Job, 0),
+		jobs: map[int]Job{},
 	}
 }
 
-func (c *Cron) AddFunction(period time.Duration, job Job) {
+func (c *Cron) AddFunction(expectedDuration time.Duration, period time.Duration, job Job, identifier int) {
 	c.wg.Add(1)
 	f := func() {
 		for {
@@ -26,7 +26,7 @@ func (c *Cron) AddFunction(period time.Duration, job Job) {
 			time.Sleep(period)
 		}
 	}
-	c.jobs = append(c.jobs, f)
+	c.jobs[identifier] = f
 }
 
 func (c *Cron) RunAll() {
