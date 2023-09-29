@@ -9,9 +9,10 @@ import (
 )
 
 type cron struct {
-	wg   sync.WaitGroup
-	jobs map[int]inst.Job
-	log  inst.Logger
+	wg      sync.WaitGroup
+	jobs    map[int]inst.Job
+	running map[int]bool
+	log     inst.Logger
 }
 
 // NewCron creates a cron scheduler.
@@ -25,9 +26,10 @@ type cron struct {
 //	cron: The cron scheduler instance.
 func NewCron(file ...string) cron {
 	return cron{
-		wg:   sync.WaitGroup{},
-		jobs: map[int]inst.Job{},
-		log:  inst.NewLogger(file...),
+		wg:      sync.WaitGroup{},
+		jobs:    map[int]inst.Job{},
+		running: map[int]bool{},
+		log:     inst.NewLogger(file...),
 	}
 }
 
@@ -40,9 +42,15 @@ func NewCron(file ...string) cron {
 //	job (instruments.Job): The job code that should be executed periodically.
 //	indentifier (int): An identifier used by the scheduler to label the jobs.
 func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job inst.Job, identifier int) {
+	c.log.Info("Attempting to register job with id", identifier, "......................")
+	if c.running[identifier] {
+		c.log.Error("Job with id", identifier, "is already registered and running. Please stop it first then attempt to replace it.")
+		return
+	}
+
 	c.wg.Add(1)
 	loop := func() {
-		for {
+		for c.running[identifier] {
 			c.log.Info("Started Job", identifier)
 			startTime, endTime := inst.JobTime(job)
 			actualDuration := endTime.Sub(startTime)
@@ -51,15 +59,65 @@ func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job 
 			time.Sleep(timeToSleep)
 			c.log.Info("Finished Job", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
 		}
+
+		c.wg.Done()
 	}
 	c.jobs[identifier] = loop
+	c.log.Info("Registered job with id", identifier, "successfully!!!")
 }
 
 // RunAll runs all the Jobs registered to the cron job pool.
 func (c *cron) RunAll() {
-	for identifier, job := range c.jobs {
-		go inst.HandleErrors(job, identifier, c.log)
+	for identifier := range c.jobs {
+		c.RunJob(identifier)
 	}
+}
 
+// StopAll stops all the Jobs that are running.
+func (c *cron) StopAll() {
+	for identifier := range c.jobs {
+		c.StopJob(identifier)
+	}
+}
+
+// RunJob runs a specfic job from cron job pool.
+//
+// Parameters:
+//
+//	identifier (int): the cron id of the job that should start running periodically.
+func (c *cron) RunJob(identifier int) {
+	c.log.Info("Attempting to run job with id", identifier, "......................")
+	if c.running[identifier] {
+		c.log.Warn("Job with id", identifier, "is already running. Nothing will change.")
+	} else {
+		job, ok := c.jobs[identifier]
+		if !ok {
+			c.log.Warn("Job with id", identifier, "was not registered. No job will be scheduled.")
+			return
+		}
+		c.running[identifier] = true
+		go inst.HandleErrors(job, identifier, c.log)
+		c.log.Info("Started running job with id", identifier, "successfully!!!")
+	}
+}
+
+// StopJob stops a specfic job from cron job pool.
+//
+// Parameters:
+//
+//	identifier (int): the cron id of the job that should stop running periodically.
+func (c *cron) StopJob(identifier int) {
+	c.log.Info("Attempting to stop job with id", identifier, "......................")
+	if !c.running[identifier] {
+		c.log.Warn("Job with id", identifier, "is either stopped or not existing. Nothing will change.")
+	} else {
+		c.running[identifier] = false
+		c.log.Info("Stopped running job with id", identifier, "successfully!!!")
+	}
+}
+
+// WaitJobs waits until the user click "Enter" to allow for the Jobs to run periodically.
+func (c *cron) WaitJobs() {
 	fmt.Scanln()
+	c.log.Info("Exiting cron.......")
 }
