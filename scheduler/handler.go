@@ -1,4 +1,4 @@
-package instruments
+package scheduler
 
 // HandleErrors runs a Job while guarding the program execution from any errors in the job.
 //

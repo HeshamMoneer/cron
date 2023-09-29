@@ -1,4 +1,4 @@
-package instruments
+package scheduler
 
 import (
 	"io"

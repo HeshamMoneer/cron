@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"sync"
 	"time"
-
-	inst "cron/instruments"
 )
 
 type cron struct {
 	wg      sync.WaitGroup
-	jobs    map[int]inst.Job
+	jobs    map[int]Job
 	running map[int]bool
-	log     inst.Logger
+	log     Logger
 }
 
 // NewCron creates a cron scheduler.
@@ -27,9 +25,9 @@ type cron struct {
 func NewCron(file ...string) cron {
 	return cron{
 		wg:      sync.WaitGroup{},
-		jobs:    map[int]inst.Job{},
+		jobs:    map[int]Job{},
 		running: map[int]bool{},
-		log:     inst.NewLogger(file...),
+		log:     NewLogger(file...),
 	}
 }
 
@@ -41,7 +39,7 @@ func NewCron(file ...string) cron {
 //	period (time.Duration): The period of the job recurrence (i.e., the job repeats once every "period" amount of time).
 //	job (instruments.Job): The job code that should be executed periodically.
 //	indentifier (int): An identifier used by the scheduler to label the jobs.
-func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job inst.Job, identifier int) {
+func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job Job, identifier int) {
 	c.log.Info("Attempting to register job with id", identifier, "......................")
 	if c.running[identifier] {
 		c.log.Error("Job with id", identifier, "is already registered and running. Please stop it first then attempt to replace it.")
@@ -52,7 +50,7 @@ func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job 
 	loop := func() {
 		for c.running[identifier] {
 			c.log.Info("Started Job", identifier)
-			startTime, endTime := inst.JobTime(job)
+			startTime, endTime := JobTime(job)
 			actualDuration := endTime.Sub(startTime)
 			timeToSleep := period - actualDuration
 
@@ -96,7 +94,7 @@ func (c *cron) RunJob(identifier int) {
 			return
 		}
 		c.running[identifier] = true
-		go inst.HandleErrors(job, identifier, c.log)
+		go HandleErrors(job, identifier, c.log)
 		c.log.Info("Started running job with id", identifier, "successfully!!!")
 	}
 }
