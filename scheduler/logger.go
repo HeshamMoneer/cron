@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ type Logger struct {
 	infoLogger  *log.Logger
 	warnLogger  *log.Logger
 	errorLogger *log.Logger
+	isConsole   bool
 }
 
 func getLoggerOutput(file ...string) io.Writer {
@@ -34,6 +36,7 @@ func NewLogger(file ...string) Logger {
 		infoLogger:  log.New(output, "CRON INFO : ", flags),
 		warnLogger:  log.New(output, "CRON WARN : ", flags),
 		errorLogger: log.New(output, "CRON ERROR: ", flags),
+		isConsole:   output == os.Stdout,
 	}
 }
 
@@ -42,9 +45,17 @@ func (l *Logger) Info(v ...any) {
 }
 
 func (l *Logger) Warn(v ...any) {
+	if l.isConsole {
+		fmt.Printf("\033[1;33m")
+		defer fmt.Printf("\033[0m")
+	}
 	l.warnLogger.Println(v...)
 }
 
 func (l *Logger) Error(v ...any) {
+	if l.isConsole {
+		fmt.Printf("\033[1;31m")
+		defer fmt.Printf("\033[0m")
+	}
 	l.errorLogger.Println(v...)
 }
