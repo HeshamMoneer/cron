@@ -4,22 +4,31 @@ import (
 	"time"
 )
 
-// JobTime runs a Job and times it.
+// timer returns a Job that is timed (i.e., its start and end times are measured and logged, and the goroutine is sent to sleep for the appropriate amount of time). It executes the actual job.
 //
 // Parameters:
 //
-//	job (Job): The job code that should be run.
+//	expectedDuration (time.Duration): The time expected to be taken for the job execution.
+//	period (time.Duration): The period of the job recurrence (i.e., the job repeats once every "period" amount of time).
+//	job (instruments.Job): The job code that should be executed periodically.
+//	indentifier (int): An identifier used by the scheduler to label the jobs.
 //
 // Returns:
 //
-//	time.Time: The time recorded before the job was run.
-//	time.Time: The time recorded after the job was run.
-func JobTime(job Job) (time.Time, time.Time) {
-	startTime := time.Now()
+// Job is the job with the time decoration.
+func (c *cron) timer(expectedDuration time.Duration, period time.Duration, job Job, identifier int) Job {
+	timed := func() {
+		startTime := time.Now()
 
-	job()
+		job()
 
-	endTime := time.Now()
+		endTime := time.Now()
 
-	return startTime, endTime
+		actualDuration := endTime.Sub(startTime)
+		timeToSleep := period - actualDuration
+		c.log.Info("Finished Job", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
+		time.Sleep(timeToSleep)
+	}
+
+	return timed
 }

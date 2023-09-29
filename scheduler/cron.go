@@ -47,20 +47,7 @@ func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job 
 	}
 
 	c.wg.Add(1)
-	loop := func() {
-		for c.running[identifier] {
-			c.log.Info("Started Job", identifier)
-			startTime, endTime := JobTime(job)
-			actualDuration := endTime.Sub(startTime)
-			timeToSleep := period - actualDuration
-
-			time.Sleep(timeToSleep)
-			c.log.Info("Finished Job", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
-		}
-
-		c.wg.Done()
-	}
-	c.jobs[identifier] = loop
+	c.jobs[identifier] = c.handler(expectedDuration, period, job, identifier)
 	c.log.Info("Registered job with id", identifier, "successfully!!!")
 }
 
@@ -94,7 +81,7 @@ func (c *cron) RunJob(identifier int) {
 			return
 		}
 		c.running[identifier] = true
-		go HandleErrors(job, identifier, c.log)
+		go job()
 		c.log.Info("Started running job with id", identifier, "successfully!!!")
 	}
 }
