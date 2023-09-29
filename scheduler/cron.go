@@ -14,7 +14,7 @@ type cron struct {
 	log  inst.Logger
 }
 
-func Cron(file ...string) cron {
+func NewCron(file ...string) cron {
 	return cron{
 		wg:   sync.WaitGroup{},
 		jobs: map[int]inst.Job{},
@@ -22,7 +22,7 @@ func Cron(file ...string) cron {
 	}
 }
 
-func (c *cron) AddFunction(expectedDuration time.Duration, period time.Duration, job inst.Job, identifier int) {
+func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job inst.Job, identifier int) {
 	c.wg.Add(1)
 	loop := func() {
 		for {
@@ -40,7 +40,7 @@ func (c *cron) AddFunction(expectedDuration time.Duration, period time.Duration,
 
 func (c *cron) RunAll() {
 	for identifier, job := range c.jobs {
-		go inst.HandleErrors(job, c.log, identifier)
+		go inst.HandleErrors(job, identifier, c.log)
 	}
 
 	fmt.Scanln()

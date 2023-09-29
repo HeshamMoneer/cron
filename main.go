@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	c := cron.Cron()
-	c.AddFunction(0, time.Millisecond*1000, func() {
+	c := cron.NewCron()
+	c.AddJob(0, time.Millisecond*1000, func() {
 		fmt.Println(1)
 	}, 1)
-	c.AddFunction(0, time.Millisecond*2000, func() {
+	c.AddJob(0, time.Millisecond*2000, func() {
 		fmt.Println(2)
 	}, 2)
-	c.AddFunction(0, time.Second*10, func() {
+	c.AddJob(0, time.Second*10, func() {
 		fmt.Println(3)
 	}, 2)
 

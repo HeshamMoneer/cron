@@ -12,18 +12,18 @@ type Logger struct {
 	errorLogger *log.Logger
 }
 
-func getLoggerOutput(args ...string) io.Writer {
-	if len(args) == 0 {
+func getLoggerOutput(file ...string) io.Writer {
+	if len(file) == 0 {
 		return os.Stdout
 	} else {
-		fileName := args[0]
+		fileName := file[0]
 		file, _ := os.Create("./logs/" + fileName + ".log")
 		return file
 	}
 }
 
-func NewLogger(args ...string) Logger {
-	output := getLoggerOutput(args...)
+func NewLogger(file ...string) Logger {
+	output := getLoggerOutput(file...)
 	flags := log.Ldate | log.Ltime | log.Lmicroseconds
 	return Logger{
 		infoLogger:  log.New(output, "CRON INFO : ", flags),
