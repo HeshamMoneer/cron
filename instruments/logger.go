@@ -22,6 +22,11 @@ func getLoggerOutput(file ...string) io.Writer {
 	}
 }
 
+// NewLogger creates a new logger with three logging levels Info, Warn, and Error.
+//
+// Parameters:
+//
+//	fileName [optional] (string): If passed, the logger creates a file in the logs folder and appends logs to it. Otherwise, the logger appends logs by default to the standard output.
 func NewLogger(file ...string) Logger {
 	output := getLoggerOutput(file...)
 	flags := log.Ldate | log.Ltime | log.Lmicroseconds

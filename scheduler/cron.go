@@ -14,6 +14,15 @@ type cron struct {
 	log  inst.Logger
 }
 
+// NewCron creates a cron scheduler.
+//
+// Parameters:
+//
+//	fileName [optional] (string): If passed, the scheduler logs go to a file in the logs folder. Otherwise, the logs go by default to the standard output.
+//
+// Returns:
+//
+//	cron: The cron scheduler instance.
 func NewCron(file ...string) cron {
 	return cron{
 		wg:   sync.WaitGroup{},
@@ -22,6 +31,14 @@ func NewCron(file ...string) cron {
 	}
 }
 
+// AddJob registers a Job to the cron scheduler job pool to be run periodically when needed.
+//
+// Parameters:
+//
+//	expectedDuration (time.Duration): The time expected to be taken for the job execution.
+//	period (time.Duration): The period of the job recurrence (i.e., the job repeats once every "period" amount of time).
+//	job (instruments.Job): The job code that should be executed periodically.
+//	indentifier (int): An identifier used by the scheduler to label the jobs.
 func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job inst.Job, identifier int) {
 	c.wg.Add(1)
 	loop := func() {
@@ -38,6 +55,7 @@ func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job 
 	c.jobs[identifier] = loop
 }
 
+// RunAll runs all the Jobs registered to the cron job pool.
 func (c *cron) RunAll() {
 	for identifier, job := range c.jobs {
 		go inst.HandleErrors(job, identifier, c.log)
