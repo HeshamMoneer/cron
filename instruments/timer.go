@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-func jobTime(job Job) (time.Time, time.Time) {
+func JobTime(job Job) (time.Time, time.Time) {
 	startTime := time.Now()
 
 	job()
