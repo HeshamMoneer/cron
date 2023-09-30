@@ -26,6 +26,9 @@ func (c *cron) timer(expectedDuration time.Duration, period time.Duration, job J
 
 		actualDuration := endTime.Sub(startTime)
 		timeToSleep := period - actualDuration
+		if timeToSleep < 0 {
+			timeToSleep = 0
+		}
 		c.log.Info("Finished Job", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
 		time.Sleep(timeToSleep)
 	}
