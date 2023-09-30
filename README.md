@@ -8,7 +8,7 @@ A job in this project referes to a go function that expects no parameters and re
 ### Decorated job
 A decorated job in this project refers to a job whose code has been modified in order to satisfy certain prerequisities. 
 
-First, a job code is wrapped in a `timer`. This adds logic to calculate and log the job execution time, and it also sends the job goroutine to sleep for the remaining of the scheduling period time.
+First, a job code is wrapped in a `timer`. This adds logic to calculate and log the job execution time, and it also sends the job goroutine to sleep for the remaining of the scheduling period time. It also makes sure that a single job execution does not exceed its expected time (i.e., its timeout value).
 
 Second, the looper adds some code to the timed job that repeats the job code as long as needed.
 
@@ -91,7 +91,6 @@ The tests, found in `shceduler/cron_test.go`, were then designed to cover as muc
 In order to run the tests, go to the project root directory and run the `run_tests.sh` script. The tests would take less than a minute, and at the end, a coverage report opens in your default browser.
 
 ## Possible future improvements
-1. The scheduler does not handle the case where it's passed a job with some infinite loop, or a job that takes way longer than it is expected to run. This could be solved by regarding the `expectedDuration` value passed to cron with each job as a timeout value for example.
-2. The cron `WaitJobs()` function could be improved by having an additional option to stop cron programmatically than having just the option to wait for the user input in order to stop code execution.
-3. Cron could be extended to support jobs written in different languages and not just `golang` jobs.
-4. Another extension to the project could be to allow for registering and scheduling jobs during the project runtime (through standard input or any other input medium).
+1. The cron `WaitJobs()` function could be improved by having an additional option to stop cron programmatically than having just the option to wait for the user input in order to stop code execution.
+2. Cron could be extended to support jobs written in different languages and not just `golang` jobs.
+3. Another extension to the project could be to allow for registering and scheduling jobs during the project runtime (through standard input or any other input medium).

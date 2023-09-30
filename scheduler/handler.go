@@ -5,7 +5,7 @@ import "time"
 // handler returns a Job guarded from errors. It decorates the job by the looper before executing it.
 //
 // Parameters:
-//	expectedDuration (time.Duration): The time expected to be taken for the job execution.
+//	expectedDuration (time.Duration): The time expected to be taken for the job execution. This acts as the job timeout value.
 //	period (time.Duration): The period of the job recurrence (i.e., the job repeats once every "period" amount of time).
 //	job (instruments.Job): The job code that should be executed periodically.
 //	indentifier (int): An identifier used by the scheduler to label the jobs.
@@ -17,7 +17,7 @@ func (c *cron) handler(expectedDuration time.Duration, period time.Duration, job
 	handled := func() {
 		defer func() {
 			if err := recover(); err != nil {
-				c.log.Error(err)
+				c.log.Error("Job", identifier, "has this error ->", err)
 				c.log.Warn("Exited job with id", identifier)
 				c.running[identifier] = false
 			}
