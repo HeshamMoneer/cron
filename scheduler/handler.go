@@ -19,6 +19,7 @@ func (c *cron) handler(expectedDuration time.Duration, period time.Duration, job
 			if err := recover(); err != nil {
 				c.log.Error(err)
 				c.log.Warn("Exited job with id", identifier)
+				c.running[identifier] = false
 			}
 		}()
 

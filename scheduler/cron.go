@@ -54,14 +54,18 @@ func (c *cron) AddJob(expectedDuration time.Duration, period time.Duration, job 
 // RunAll runs all the Jobs registered to the cron job pool.
 func (c *cron) RunAll() {
 	for identifier := range c.jobs {
-		c.RunJob(identifier)
+		if !c.running[identifier] {
+			c.RunJob(identifier)
+		}
 	}
 }
 
 // StopAll stops all the Jobs that are running.
 func (c *cron) StopAll() {
 	for identifier := range c.jobs {
-		c.StopJob(identifier)
+		if c.running[identifier] {
+			c.StopJob(identifier)
+		}
 	}
 }
 
