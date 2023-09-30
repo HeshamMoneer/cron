@@ -9,7 +9,7 @@ import (
 //
 // Parameters:
 //
-//	expectedDuration (time.Duration): The time expected to be taken for the job execution. This acts as the job timeout value.
+//	expectedDuration (time.Duration): The time expected to be taken for the job execution. This acts as a single job execution timeout value.
 //	period (time.Duration): The period of the job recurrence (i.e., the job repeats once every "period" amount of time).
 //	job (instruments.Job): The job code that should be executed periodically.
 //	indentifier (int): An identifier used by the scheduler to label the jobs.
