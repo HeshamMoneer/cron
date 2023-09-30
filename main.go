@@ -21,5 +21,7 @@ func main() {
 
 	c.RunAll()
 
+	c.WaitJobs()
+
 	fmt.Println("-------------")
 }
