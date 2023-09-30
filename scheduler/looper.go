@@ -15,6 +15,10 @@ import "time"
 // Job is the job with the loop and the time decorations.
 func (c *cron) looper(expectedDuration time.Duration, period time.Duration, job Job, identifier int) Job {
 	loop := func() {
+		if period < 0 {
+			period = 0
+		}
+		time.Sleep(period)
 		for c.running[identifier] {
 			c.log.Info("Started Job with id", identifier)
 			c.timer(expectedDuration, period, job, identifier)()
