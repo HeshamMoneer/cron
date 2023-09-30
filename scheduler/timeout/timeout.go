@@ -12,6 +12,13 @@ var (
 func Run(fn func() error, timeout time.Duration) error {
 	c := make(chan error, 1)
 	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				c <- fmt.Errorf("%v", err)
+				close(c)
+			}
+		}()
+
 		c <- fn()
 		close(c)
 	}()
