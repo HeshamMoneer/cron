@@ -29,7 +29,7 @@ func (c *cron) timer(expectedDuration time.Duration, period time.Duration, job J
 		if timeToSleep < 0 {
 			timeToSleep = 0
 		}
-		c.log.Info("Finished Job", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
+		c.log.Info("Finished Job with id", identifier, "Expected Duration:", expectedDuration, "Actual Duration:", actualDuration)
 		time.Sleep(timeToSleep)
 	}
 

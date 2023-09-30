@@ -71,9 +71,9 @@ func (c *cron) StopAll() {
 //
 //	identifier (int): the cron id of the job that should start running periodically.
 func (c *cron) RunJob(identifier int) {
-	c.log.Info("Attempting to run job with id", identifier, "......................")
+	c.log.Info("Attempting to schedule job with id", identifier, "......................")
 	if c.running[identifier] {
-		c.log.Warn("Job with id", identifier, "is already running. Nothing will change.")
+		c.log.Warn("Job with id", identifier, "is already scheduled. Nothing will change.")
 	} else {
 		job, ok := c.jobs[identifier]
 		if !ok {
@@ -82,7 +82,7 @@ func (c *cron) RunJob(identifier int) {
 		}
 		c.running[identifier] = true
 		go job()
-		c.log.Info("Started running job with id", identifier, "successfully!!!")
+		c.log.Info("Started scheduling job with id", identifier, "successfully!!!")
 	}
 }
 
@@ -97,7 +97,7 @@ func (c *cron) StopJob(identifier int) {
 		c.log.Warn("Job with id", identifier, "is either stopped or not existing. Nothing will change.")
 	} else {
 		c.running[identifier] = false
-		c.log.Info("Stopped running job with id", identifier, "successfully!!!")
+		c.log.Info("Stopped scheduling job with id", identifier, "successfully!!!")
 	}
 }
 
