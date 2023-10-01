@@ -110,9 +110,10 @@ func TestFour(t *testing.T) {
 	c.StopJob(1)
 	c.StopJob(1)
 
+	time.Sleep(10 * time.Millisecond)
 	lastX := x
 	time.Sleep(50 * time.Millisecond)
-	should(t, x == lastX, "attemping to stop a non-existing job should not affect the scheduling of other jobs")
+	should(t, x == lastX, "attemping to stop a non-existing job should not affect the scheduling of other jobs, x = %d, lastX = %d", x, lastX)
 }
 
 // TestFive attempts to run an already running job, the scheduler should not crash then

@@ -22,7 +22,7 @@ This is a utility that logs information to a designated output. The output could
 ### Cron job pool
 This is a table that is a part of the scheduler. It contains the following infromation:
 1. the identifiers of the jobs registered in it, 
-2. their respective states (i.e., their schedule is running or not), 
+2. their respective states (i.e., whether their schedule is running or not), 
 3. and the decorated code of each job. 
 
 A cron job pool example is presented in the table below:
@@ -58,7 +58,7 @@ c.RunAll()
 ```
 4. Wait for the running jobs.
 ```go
-// this runs all scheduled jobs until the user clicks "enter" button
+// this waits until the user clicks "enter" button
 c.WaitJobs()
 ```
 
@@ -91,6 +91,6 @@ The tests, found in `shceduler/cron_test.go`, were then designed to cover as muc
 In order to run the tests, go to the project root directory and run the `run_tests.sh` script. The tests would take less than a minute, and at the end, a coverage report opens in your default browser.
 
 ## Possible future improvements
-1. The cron `WaitJobs()` function could be improved by having an additional option to stop cron programmatically than having just the option to wait for the user input in order to stop code execution.
+1. The cron `WaitJobs()` function could be improved by having an additional option to stop cron programmatically than having just the option to wait for the user input in order to stop the whole program.
 2. Cron could be extended to support jobs written in different languages and not just `golang` jobs.
 3. Another extension to the project could be to allow for registering and scheduling jobs during the project runtime (through standard input or any other input medium).
